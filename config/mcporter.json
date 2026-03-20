@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "douyin_search": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory=/Users/burning/Desktop/ai 项目/gstack/content-matrix/skills/tools/search/douyin/douyin_mcp",
+        "python",
+        "main.py"
+      ]
+    }
+  },
+  "imports": []
+}

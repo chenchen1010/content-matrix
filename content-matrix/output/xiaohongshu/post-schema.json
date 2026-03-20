@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "小红书发布任务",
+  "description": "供 RPA 消费的小红书帖子结构，每个字段对应创作者页面的一个表单项",
+  "type": "object",
+  "required": ["title", "content", "files"],
+  "properties": {
+
+    "post_type": {
+      "type": "string",
+      "enum": ["image_text", "video", "long_text"],
+      "default": "image_text",
+      "description": "笔记类型：图文 / 视频 / 长文"
+    },
+
+    "title": {
+      "type": "string",
+      "maxLength": 20,
+      "description": "笔记标题，20字以内"
+    },
+
+    "content": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "正文内容，支持 emoji，最多1000字"
+    },
+
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "maxItems": 10,
+      "default": [],
+      "description": "话题标签列表，每项含 # 号，如 #上海家政，最多 10 个"
+    },
+
+    "files": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "图片/视频的本地绝对路径列表，按顺序上传"
+    },
+
+    "cover_index": {
+      "type": ["integer", "null"],
+      "default": 0,
+      "description": "封面图片索引（从0开始），仅图文笔记有效；null = 使用默认第一张"
+    },
+
+    "location": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "POI 地点名称，null = 不添加地点"
+    },
+
+    "mentions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "@用户列表，每项含 @ 符号，如 @家政小王"
+    },
+
+    "group_chat": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "选择群聊名称，发布后同步到该群；null = 不选择群聊"
+    },
+
+    "schedule": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "定时发布时间，格式如 '2026-03-19 20:17'；null = 立即发布"
+    },
+
+    "product": {
+      "type": "string",
+      "default": "",
+      "description": "关联商品，填商品名或商品 ID 均可；空字符串 = 不添加"
+    },
+
+    "file": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "笔记附件的本地绝对路径，null = 不添加附件"
+    },
+
+    "meta": {
+      "type": "object",
+      "description": "流水线元数据，RPA 可忽略，供上下游追踪",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一 ID，格式: xhs-{YYYYMMDD}-{HHmmss}-{variant}"
+        },
+        "created_at": {
+          "type": "string",
+          "description": "文件生成时间，ISO 8601"
+        },
+        "source_topic": {
+          "type": ["string", "null"],
+          "description": "来源选题"
+        },
+        "variant": {
+          "type": ["string", "null"],
+          "description": "矩阵变体说明，如 '用户视角-干货分享型'"
+        },
+        "obsidian_note": {
+          "type": ["string", "null"],
+          "description": "对应的 Obsidian 笔记路径，发布后回写状态用"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "publishing", "done", "failed"],
+          "default": "pending"
+        },
+        "published_at": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "实际发布时间，RPA 发布成功后回填"
+        },
+        "error": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "失败原因，RPA 发布失败后回填"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,3 @@
+[submodule "content-matrix/skills/tools/search/douyin/douyin_mcp"]
+	path = content-matrix/skills/tools/search/douyin/douyin_mcp
+	url = https://github.com/hhy5562877/douyin_mcp.git

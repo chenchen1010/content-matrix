@@ -1,0 +1,9 @@
+{
+  "name": "content-matrix-tools",
+  "private": true,
+  "description": "抖音/视频号发布工具的共享依赖（Stagehand + Playwright）",
+  "dependencies": {
+    "@browserbasehq/stagehand": "^2",
+    "dotenv": "^16"
+  }
+}

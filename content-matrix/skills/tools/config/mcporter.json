@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "douyin": {
+      "command": "python3 -m douyin_mcp_server"
+    }
+  },
+  "imports": []
+}

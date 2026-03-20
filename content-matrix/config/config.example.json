@@ -1,0 +1,10 @@
+{
+  "material_source": {
+    "primary": "obsidian",
+    "fallback": "feishu"
+  },
+  "default_platforms": ["xiaohongshu", "douyin"],
+  "content_variants": 3,
+  "industry": "教育培训",
+  "region": "上海"
+}
