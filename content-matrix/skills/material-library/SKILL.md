@@ -1,3 +1,8 @@
+---
+name: material-library
+description: 素材管理入口层，根据配置自动选择 Obsidian 或飞书作为素材存储后端
+---
+
 # 素材库路由
 
 素材管理的入口层，根据用户配置自动选择素材存储方案。
@@ -10,7 +15,7 @@
 
 ├─ 可用 → 使用 obsidian-kb skill（Obsidian 知识库）
 └─ 不可用 → 检查飞书配置
-    ├─ ~/.content-organizer/config.json 存在 → 使用飞书多维表格
+    ├─ ~/.content-organizer/config.json 存在 → 使用 feishu-drive skill（飞书云空间）
     └─ 都没有 → 提示用户选择并配置
 ```
 
@@ -26,27 +31,35 @@
 
 ## 飞书路径
 
-检测到飞书配置时，通过飞书 API 读写素材。
+检测到 `~/.content-organizer/config.json` 时，转交 `feishu-drive` skill 处理。
 
-### 读取飞书素材
+飞书路径使用云空间（Drive）的文件夹 + DocX 文档，文件夹结构与 Obsidian vault 完全一致。
+
+### 核心脚本
+
 ```bash
-CONFIG_FILE=~/.content-organizer/config.json
+SCRIPT_DIR="content-matrix/skills/feishu-drive"
 
-APP_ID=$(jq -r '.app_id' "$CONFIG_FILE")
-APP_SECRET=$(jq -r '.app_secret' "$CONFIG_FILE")
-TOKEN_RESP=$(curl -s -X POST "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal" \
-  -H "Content-Type: application/json" \
-  -d "{\"app_id\":\"$APP_ID\",\"app_secret\":\"$APP_SECRET\"}")
-TOKEN=$(echo "$TOKEN_RESP" | jq -r '.tenant_access_token')
+# 初始化项目
+python3 "$SCRIPT_DIR/feishu_drive.py" init {项目名}
 
-APP_TOKEN=$(jq -r '.app_token' "$CONFIG_FILE")
-TABLE_ID=$(jq -r '.table_id' "$CONFIG_FILE")
-curl -s "https://open.feishu.cn/open-apis/bitable/v1/apps/$APP_TOKEN/tables/$TABLE_ID/records?page_size=20" \
-  -H "Authorization: Bearer $TOKEN" | jq '.data.items'
+# 写入素材
+python3 "$SCRIPT_DIR/feishu_drive.py" write {项目名} "{路径}" {md文件}
+
+# 列出目录
+python3 "$SCRIPT_DIR/feishu_drive.py" list {项目名} [路径]
+
+# 搜索素材
+python3 "$SCRIPT_DIR/feishu_drive.py" search {项目名} {关键词}
+
+# 读取文档
+python3 "$SCRIPT_DIR/feishu_drive.py" read {项目名} {文档token}
+
+# 更新文档
+python3 "$SCRIPT_DIR/feishu_drive.py" update {项目名} {文档token} {md文件}
 ```
 
-### 写入飞书素材
-使用 `content-organizer` skill 的能力写入飞书多维表格。
+详见 `feishu-drive/SKILL.md`。
 
 ## 快捷用法
 

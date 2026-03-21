@@ -15,3 +15,11 @@ node_modules/
 
 # VSCode
 .vscode/
+.gstack/
+
+# Cookies / 会话文件
+cookies.json
+**/cookies.json
+
+# 生成产出（每台机器不同）
+content-matrix/output/

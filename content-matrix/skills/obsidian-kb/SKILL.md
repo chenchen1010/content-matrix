@@ -1,3 +1,8 @@
+---
+name: obsidian-kb
+description: 基于 Obsidian 的业务素材知识库管理，支持素材入库、检索和知识图谱
+---
+
 # Obsidian 业务知识库
 
 基于 OpenClaw 的 `@steipete/obsidian` skill，管理业务素材知识库。
