@@ -31,6 +31,17 @@
 - **唯一目录结构定义**：`content-matrix/schemas/vault-structure.md`，所有 skill 引用它而非各自定义。
 - **禁止在 `content-matrix/skills/` 下写入任何用户数据文件**（downloads、images、progress.json 等）。
 
+### 会话启动：首次使用检测
+
+每次新会话，在更新检查之后，检测用户是否首次使用：
+
+```bash
+test -f ~/.content-matrix/config.json && echo "RETURNING_USER" || echo "NEW_USER"
+```
+
+- 输出 `NEW_USER` → 读取 `content-matrix/skills/first-run/SKILL.md` 并执行引导流程
+- 输出 `RETURNING_USER` → 跳过，直接进入用户的工作
+
 ### 平台登录
 
 用户要登录抖音搜索（douyin_search）或小红书 MCP 时：**不要**让用户复制终端命令。应读取并遵循 `content-matrix/skills/platform-login/SKILL.md`，由助手代执行脚本，或提示 **Cmd+Shift+P → Tasks: Run Task →「内容矩阵 · 抖音/小红书登录」**。

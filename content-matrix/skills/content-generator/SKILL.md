@@ -97,21 +97,13 @@ AI 对搜索结果进行相关性排序：
 cat {用户指定的文件路径}
 ```
 
-**方式四：飞书多维表格**
+**方式四：飞书知识库**
 ```bash
-CONFIG_FILE=~/.content-organizer/config.json
+# 通过 lark-cli 搜索素材
+lark-cli docs +search --query "{关键词}" --count 20
 
-APP_ID=$(jq -r '.app_id' "$CONFIG_FILE")
-APP_SECRET=$(jq -r '.app_secret' "$CONFIG_FILE")
-TOKEN_RESP=$(curl -s -X POST "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal" \
-  -H "Content-Type: application/json" \
-  -d "{\"app_id\":\"$APP_ID\",\"app_secret\":\"$APP_SECRET\"}")
-TOKEN=$(echo "$TOKEN_RESP" | jq -r '.tenant_access_token')
-
-APP_TOKEN=$(jq -r '.app_token' "$CONFIG_FILE")
-TABLE_ID=$(jq -r '.table_id' "$CONFIG_FILE")
-curl -s "https://open.feishu.cn/open-apis/bitable/v1/apps/$APP_TOKEN/tables/$TABLE_ID/records?page_size=20" \
-  -H "Authorization: Bearer $TOKEN" | jq '.data.items'
+# 读取具体文档
+lark-cli docs +fetch --document-id "{doc_token}"
 ```
 
 ### Step 2.5: 卖点→买点三级转化

@@ -21,8 +21,8 @@ outputs:
   obsidian-cli print-default --path-only 2>/dev/null
 
 ├─ 可用 → 使用 obsidian-kb skill（Obsidian 知识库）
-└─ 不可用 → 检查飞书配置
-    ├─ ~/.content-organizer/config.json 存在 → 使用 feishu-drive skill（飞书云空间）
+└─ 不可用 → 检查飞书
+    ├─ lark-cli 可用（command -v lark-cli）→ 使用 feishu-drive skill（飞书知识库）
     └─ 都没有 → 提示用户选择并配置
 ```
 
@@ -38,32 +38,24 @@ outputs:
 
 ## 飞书路径
 
-检测到 `~/.content-organizer/config.json` 时，转交 `feishu-drive` skill 处理。
+检测到 `lark-cli` 可用时，转交 `feishu-drive` skill 处理。
 
-飞书路径使用云空间（Drive）的文件夹 + DocX 文档，文件夹结构与 Obsidian vault 完全一致。
+飞书路径使用知识库（Wiki Space）+ DocX 文档，通过 `lark-cli` 操作，结构与 Obsidian vault 一致。
 
-### 核心脚本
+### 核心命令
 
 ```bash
-SCRIPT_DIR="content-matrix/skills/feishu-drive"
-
-# 初始化项目
-python3 "$SCRIPT_DIR/feishu_drive.py" init {项目名}
-
-# 写入素材
-python3 "$SCRIPT_DIR/feishu_drive.py" write {项目名} "{路径}" {md文件}
-
-# 列出目录
-python3 "$SCRIPT_DIR/feishu_drive.py" list {项目名} [路径]
-
 # 搜索素材
-python3 "$SCRIPT_DIR/feishu_drive.py" search {项目名} {关键词}
+lark-cli docs +search --query "{关键词}" --count 20
+
+# 创建文档
+lark-cli docs +create --title "{标题}" --wiki-node "{node_token}" --markdown "{内容}"
 
 # 读取文档
-python3 "$SCRIPT_DIR/feishu_drive.py" read {项目名} {文档token}
+lark-cli docs +fetch --document-id "{doc_token}"
 
 # 更新文档
-python3 "$SCRIPT_DIR/feishu_drive.py" update {项目名} {文档token} {md文件}
+lark-cli docs +update --document-id "{doc_token}" --mode overwrite --markdown "{内容}"
 ```
 
 详见 `feishu-drive/SKILL.md`。

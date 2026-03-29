@@ -74,12 +74,13 @@ content-matrix/                              ← 框架层（GitHub 同步，不
 
 | Skill | 功能 |
 |-------|------|
+| **first-run** | 新用户首次引导：介绍能力，按意图检测依赖并路由 |
+| **master-workflow** | 总编排：选题→素材→生成→发布→回写 |
 | **topic-scout** | 搜索平台爆款，分析选题方向，存入知识库 |
 | **content-generator** | 基于素材+选题生成多平台内容，支持矩阵变体 |
 | **obsidian-kb** | 业务知识库管理（一项目一 vault） |
-| **wechat-layout-clone** | 从任意公众号图文抽取内联样式，归纳成可复用主题 |
 | **material-library** | 素材库路由（Obsidian / 飞书） |
-| **master-workflow** | 总编排：选题→素材→生成→发布→回写 |
+| **wechat-layout-clone** | 从任意公众号图文抽取内联样式，归纳成可复用主题 |
 | **platform-login** | 引导抖音/小红书登录：由 AI 代跑脚本，不要求用户复制终端命令 |
 
 ## Tools
