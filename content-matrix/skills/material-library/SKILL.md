@@ -1,11 +1,18 @@
 ---
 name: material-library
 description: 素材管理入口层，根据配置自动选择 Obsidian 或飞书作为素材存储后端
+inputs:
+  - 操作类型（录入 / 检索 / 管理）
+  - 关键词或素材内容
+outputs:
+  - 路由到 obsidian-kb 或 feishu-drive，产出写入用户数据层
 ---
 
 # 素材库路由
 
 素材管理的入口层，根据用户配置自动选择素材存储方案。
+
+> **架构原则**：本 skill 是纯路由层，不直接写入任何文件。所有存储操作委托给 obsidian-kb 或 feishu-drive。
 
 ## 路由逻辑
 

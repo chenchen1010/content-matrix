@@ -9,37 +9,55 @@ cd content-matrix
 ./setup.sh
 ```
 
-## 项目结构
+## 架构原则：框架与数据分离
 
 ```
-content-matrix/
-├── setup.sh                                ← 一键安装
-├── .env.example                            ← LLM API / 微信配置
+content-matrix/                              ← 框架层（GitHub 同步，不含用户数据）
+├── setup.sh                                 ← 一键安装
+├── .env.example                             ← 配置模板
+├── schemas/
+│   └── vault-structure.md                   ← Vault 目录结构唯一定义
 ├── config/
 │   └── config.example.json
-└── skills/
-    ├── topic-scout/SKILL.md                ← 选题侦察
-    ├── content-generator/                  ← 内容生成
+├── scripts/
+│   └── check-update.sh                      ← 框架版本检查
+└── skills/                                  ← 所有 skill + tool 代码
+    ├── master-workflow/SKILL.md              ← 总编排
+    ├── topic-scout/SKILL.md                 ← 选题侦察
+    ├── content-generator/                   ← 内容生成
     │   ├── SKILL.md
-    │   └── templates/                      ← 平台 prompt 模板
-    ├── obsidian-kb/SKILL.md                ← 知识库管理
-    ├── wechat-layout-clone/SKILL.md       ← 公众号排版复刻（抽样式 → 主题）
-    ├── material-library/SKILL.md           ← 素材路由
-    ├── master-workflow/SKILL.md            ← 总编排（调度所有 skill + tools）
-    ├── platform-login/SKILL.md             ← 平台登录引导（AI 代跑，不复制命令）
-    └── tools/                              ← 平台工具
-        ├── package.json                    ← 共享依赖（Stagehand）
-        ├── search/                         ← 搜索类
-        │   ├── xiaohongshu/                ← 小红书搜索/详情
-        │   ├── douyin/                     ← 抖音视频解析
-        │   └── wechat/                     ← 公众号文章搜索+阅读
-        └── publish/                        ← 发布类
-            ├── xiaohongshu/                ← 小红书发布（MCP）
-            ├── douyin/                     ← 抖音发布（Stagehand）
-            ├── wechat-channels/            ← 视频号发布（短视频）
-            └── wechat-article/             ← 公众号发布（文章）
+    │   └── templates/                       ← 平台 prompt 模板
+    ├── knowledge-base/                      ← 知识底座
+    ├── obsidian-kb/SKILL.md                 ← 知识库管理
+    ├── material-library/SKILL.md            ← 素材路由
+    ├── wechat-layout-clone/SKILL.md         ← 公众号排版复刻
+    ├── platform-login/SKILL.md              ← 平台登录引导
+    ├── framework-sync/SKILL.md              ← 框架版本同步
+    ├── framework-contribute/SKILL.md        ← 经验回馈
+    └── tools/                               ← 平台工具
+        ├── search/                          ← 搜索类
+        │   ├── xiaohongshu/                 ← 小红书搜索/详情
+        │   ├── douyin/                      ← 抖音视频解析
+        │   └── wechat/                      ← 公众号文章搜索+阅读
+        ├── publish/                         ← 发布类
+        │   ├── xiaohongshu/                 ← 小红书发布（MCP）
+        │   ├── douyin/                      ← 抖音发布（Stagehand）
+        │   ├── wechat-channels/             ← 视频号发布（短视频）
+        │   └── wechat-article/              ← 公众号发布（文章）
+        └── collect/                         ← 采集类
+            └── feishu-doc/                  ← 飞书文档导出
 
+~/Desktop/黑曜石/{项目名}/                     ← 用户数据层（Obsidian vault，不在 git 中）
+└── 素材库/                                   ← 所有业务产出（结构见 schemas/vault-structure.md）
+
+~/.content-matrix/                            ← 运行时配置（不在 git 中）
+├── .env                                      ← API 密钥
+├── cookies/                                  ← 平台登录凭证
+├── cache/                                    ← 缓存文件
+└── downloads/                                ← 采集工具临时输出
 ```
+
+**关键规则**：框架目录（`content-matrix/`）内只有代码和模板，零用户数据。所有产出写入 Obsidian vault 或 `~/.content-matrix/`。
 
 ## 全流程
 

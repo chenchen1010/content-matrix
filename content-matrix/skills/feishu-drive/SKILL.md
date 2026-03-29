@@ -12,6 +12,8 @@ description: 基于飞书云空间的业务素材知识库，对标 obsidian-kb 
 
 每个业务/行业/客户项目对应飞书云空间中一个独立的项目文件夹。不同项目的素材不混在一起。
 
+> 文件夹结构与 Obsidian vault 一致，见 `content-matrix/schemas/vault-structure.md`。
+
 ## 何时使用
 
 - "帮我记一下这个客户案例"、"录入素材" → 口述录入
@@ -44,7 +46,7 @@ python3 feishu_drive.py init {项目名}
     ├── 4-爆款参考/小红书/ & 抖音/
     ├── 5-选题报告/
     ├── 6-内容产出/小红书/ & 抖音/ & 公众号/ & 视频号/
-    ├── 7-发布日志/
+    ├── 10-发布日志/
     ├── 8-长尾关键词库/
     └── 9-客户画像/
 ```
@@ -99,7 +101,7 @@ python3 feishu_drive.py read {项目名} {文档token} > /tmp/note.md
 python3 feishu_drive.py update {项目名} {文档token} /tmp/note.md
 ```
 
-同时在 `7-发布日志/` 下创建发布记录文档。
+同时在 `10-发布日志/` 下创建发布记录文档。
 
 ### 流程 5: 知识库健康检查
 

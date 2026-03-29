@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 *.pyo
+.venv/
 
 # macOS
 .DS_Store
@@ -17,9 +18,31 @@ node_modules/
 .vscode/
 .gstack/
 
-# Cookies / 会话文件
-cookies.json
-**/cookies.json
+# ============================================
+# 框架 vs 用户数据分离：以下全部是运行时产物
+# skills/ 目录下不应有任何用户数据文件
+# ============================================
 
-# 生成产出（每台机器不同）
+# 平台凭证
+**/cookies.json
+**/cookies/
+
+# 运行时状态 / 缓存
+**/progress.json
+**/cache/
+
+# 采集下载产物（应输出到用户 vault，不在框架内）
+**/downloads/
+
+# 工具产出的临时文件
+**/output/
+**/debug/
+
+# 排版复刻预览产物（图片 + HTML）
+content-matrix/skills/wechat-layout-clone/preview/images/
+content-matrix/skills/wechat-layout-clone/preview/images-*/
+content-matrix/skills/wechat-layout-clone/preview/*.html
+content-matrix/skills/wechat-layout-clone/styles/*.json
+
+# 用户业务产出（每台机器不同，不入框架 git）
 content-matrix/output/

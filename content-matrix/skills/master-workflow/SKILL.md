@@ -1,11 +1,19 @@
 ---
 name: master-workflow
 description: 内容矩阵主编排：选题→素材→生成→发布→回写，一键跑通全流程
+inputs:
+  - 用户指令（"帮我做一套内容" / "跑一遍全流程" 等）
+  - 可选：指定选题、指定素材、指定平台
+outputs:
+  - 由子 skill 写入 Obsidian vault（见 schemas/vault-structure.md）
 ---
 
 # 内容矩阵主工作流
 
 一键跑通从选题到发布的完整闭环。
+
+> **架构原则**：框架归框架，产出归产出。本 skill 只做编排调度，所有数据产出由子 skill 写入用户的 Obsidian vault（或飞书），框架目录内不存任何用户数据。
+> 目录结构见 `content-matrix/schemas/vault-structure.md`。
 
 ## 何时使用
 
@@ -134,12 +142,26 @@ node skills/tools/publish/wechat-channels/publish-sph.mjs \
 
 > 详见 `skills/tools/publish/wechat-channels/README.md`
 
-#### 公众号发布
+#### 公众号发布（文章）
 
 ```bash
 python3 skills/tools/publish/wechat-article/publish.py \
-  --input="{Markdown文件路径}" \
-  --title="{标题}"
+  --app-id "$WECHAT_APP_ID" --app-secret "$WECHAT_APP_SECRET" \
+  --markdown "{Markdown文件路径}" \
+  --title "{标题}"
+```
+
+#### 公众号发布（小绿书）
+
+将一组信息图/图片发布为公众号"小绿书"格式（图片消息），最多 20 张。
+当用户说"发小绿书"、"发图片消息"、"发信息图"时使用此模式。
+
+```bash
+python3 skills/tools/publish/wechat-article/publish.py \
+  --app-id "$WECHAT_APP_ID" --app-secret "$WECHAT_APP_SECRET" \
+  --title "{标题}" \
+  --image-dir "{图片目录}" \
+  --type 小绿书
 ```
 
 > 详见 `skills/tools/publish/wechat-article/README.md`
@@ -155,9 +177,9 @@ python3 skills/tools/publish/wechat-article/publish.py \
 
 2. 更新引用素材的 `used_count` + 1
 
-3. 在 `素材库/7-发布日志/` 中记录本次发布：
+3. 在 `素材库/10-发布日志/` 中记录本次发布：
    ```
-   素材库/7-发布日志/{年-月}/{日期}-发布记录.md
+   素材库/10-发布日志/{年-月}/{日期}-发布记录.md
    ```
 
 ### Step 6: 输出汇总
@@ -180,8 +202,11 @@ python3 skills/tools/publish/wechat-article/publish.py \
 --- 视频号 ---
 版本 1: {标题} ✅ 已发布
 
---- 公众号 ---
+--- 公众号（文章） ---
 版本 1: {标题} ✅ 已发布
+
+--- 公众号（小绿书） ---
+版本 1: {标题} ✅ 已发布（{N}张图片）
 
 === 共产出 {N} 条内容，已发布 {M} 条 ===
 
@@ -195,3 +220,5 @@ python3 skills/tools/publish/wechat-article/publish.py \
 - "用这个素材帮我做矩阵" → 模式 3，跳过选题和素材检索
 - "今天的选题是XX，帮我产出" → 模式 2，跳过选题步骤
 - "把昨天生成的内容发布了" → 直接跳到 Step 4，从 Obsidian 读取待发布内容
+- "把这组图片发小绿书" → 直接调用公众号小绿书发布（`--type 小绿书`）
+- "采集这篇文章的图片发到公众号" → 用 browse 采集图片 → 小绿书发布
