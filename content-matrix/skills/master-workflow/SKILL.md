@@ -1,6 +1,17 @@
 ---
-name: master-workflow
-description: 内容矩阵主编排：选题→素材→生成→发布→回写，一键跑通全流程
+name: content-matrix
+description: 内容矩阵主编排：选题→素材→生成→发布→回写，一键跑通全流程。当用户说"帮我做一套内容"、"跑一遍全流程"、"一键产出"、"内容矩阵"时触发。
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Agent
+  - AskUserQuestion
+  - WebSearch
+  - WebFetch
 inputs:
   - 用户指令（"帮我做一套内容" / "跑一遍全流程" 等）
   - 可选：指定选题、指定素材、指定平台
@@ -49,8 +60,8 @@ outputs:
 
 topic-scout 会：
 1. 搜索平台爆款
-2. 把每条搜索结果存入 Obsidian `素材库/4-爆款参考/{平台}/`
-3. 生成选题报告存入 `素材库/5-选题报告/`
+2. 把每条搜索结果存入 Obsidian `项目/{项目名}/爆款参考/{平台}/`
+3. 生成选题报告存入 `项目/{项目名}/选题报告/`
 4. 输出推荐选题
 
 让用户从推荐选题中选择 1-3 个方向。
@@ -84,7 +95,7 @@ topic-scout 会：
 - 数量：{用户指定或默认每平台 3 个版本}
 ```
 
-content-generator 会自动将产出内容存入 Obsidian `素材库/6-内容产出/{平台}/`。
+content-generator 会自动将产出内容存入 Obsidian `项目/{项目名}/内容产出/{平台}/`。
 
 ### Step 4: 内容发布
 
@@ -170,16 +181,16 @@ python3 skills/tools/publish/wechat-article/publish.py \
 
 发布完成后，调用 `obsidian-kb` 更新记录：
 
-1. 更新 `素材库/6-内容产出/` 中对应笔记的 frontmatter：
+1. 更新 `项目/{项目名}/内容产出/` 中对应笔记的 frontmatter：
    - `status: 已发布`
    - `published_at: {时间}`
    - `published_platforms: [{平台列表}]`
 
 2. 更新引用素材的 `used_count` + 1
 
-3. 在 `素材库/10-发布日志/` 中记录本次发布：
+3. 在 `项目/{项目名}/发布日志/` 中记录本次发布：
    ```
-   素材库/10-发布日志/{年-月}/{日期}-发布记录.md
+   项目/{项目名}/发布日志/{年-月}/{日期}-发布记录.md
    ```
 
 ### Step 6: 输出汇总

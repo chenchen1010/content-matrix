@@ -45,7 +45,7 @@ python3.11 content-matrix/skills/tools/collect/feishu-doc/scripts/export_feishu_
 可通过 `--output` 参数指定其他输出目录（如 Obsidian vault）：
 
 ```bash
-python3.11 scripts/export_feishu_doc_to_md.py --output ~/Desktop/黑曜石/夜校/素材库/3-行业知识 'https://my.feishu.cn/wiki/XXXX'
+python3.11 scripts/export_feishu_doc_to_md.py --output ~/Desktop/黑曜石/内容工厂/夜校成人兴趣班/行业知识 'https://my.feishu.cn/wiki/XXXX'
 ```
 
 ## 首次运行

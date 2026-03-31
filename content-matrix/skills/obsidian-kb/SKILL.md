@@ -8,15 +8,15 @@ description: 基于 Obsidian 的业务素材知识库管理，支持素材入库
 基于 OpenClaw 的 `@steipete/obsidian` skill，管理业务素材知识库。
 本 skill 提供**业务层面**的知识库编排设计，底层读写依赖 `obsidian-cli`。
 
-## 核心原则：一个项目 = 一个 vault
+## 核心原则：一个 vault = 多个项目
 
-每个业务/行业/客户项目对应一个独立的 Obsidian vault。不同项目的素材不混在一起。
+所有项目共享一个 Obsidian vault（`~/Desktop/黑曜石/内容工厂/`），每个项目是 vault 下的一个子目录。
 
 示例：
-- `~/Desktop/黑曜石/夜校/` — 夜校项目的所有素材、选题、产出
-- `~/Desktop/黑曜石/家政/` — 家政项目的所有素材、选题、产出
+- `~/Desktop/黑曜石/内容工厂/夜校成人兴趣班/` — 夜校项目的所有素材、选题、产出
+- `~/Desktop/黑曜石/内容工厂/家政/` — 家政项目的所有素材、选题、产出
 
-用 `obsidian-cli set-default` 切换当前工作项目。
+用 `obsidian-cli set-default` 切换当前工作 vault。
 
 ## 何时使用
 
@@ -67,11 +67,11 @@ obsidian-cli print-default --path-only && echo "✅ OK"
 > 以下仅列出本 skill 直接操作的目录。
 
 本 skill 直接操作的目录：
-- `素材库/1-客户案例/` — 口述录入的客户故事
-- `素材库/2-交付故事/` — 口述录入的服务花絮
-- `素材库/3-行业知识/` — 专业知识录入
-- `素材库/10-发布日志/{YYYY-MM}/` — 发布后回写记录
-- `素材库/_模板/` — 笔记模板文件
+- `项目/{项目名}/客户案例/` — 口述录入的客户故事
+- `项目/{项目名}/交付故事/` — 口述录入的服务花絮
+- `项目/{项目名}/行业知识/` — 专业知识录入
+- `项目/{项目名}/发布日志/{YYYY-MM}/` — 发布后回写记录
+- `_模板/` — 笔记模板文件
 
 ### 双链关系
 
@@ -89,6 +89,7 @@ obsidian-cli print-default --path-only && echo "✅ OK"
 ```markdown
 ---
 type: 客户案例
+project: {项目名}
 industry: {{行业}}
 region: {{地区}}
 date: {{日期}}
@@ -131,6 +132,7 @@ status: 未使用
 ```markdown
 ---
 type: 交付故事
+project: {项目名}
 industry: {{行业}}
 region: {{地区}}
 date: {{日期}}
@@ -165,6 +167,7 @@ status: 未使用
 ```markdown
 ---
 type: 爆款参考
+project: {项目名}
 platform: {{平台}}
 original_url: {{原始链接}}
 date_collected: {{采集日期}}
@@ -225,31 +228,31 @@ tags:
 **Step 2:** 创建 vault 目录和素材库结构：
 
 ```bash
-PROJECT_NAME="夜校"  # 用户指定的项目名
-VAULT_PATH=~/Desktop/黑曜石/$PROJECT_NAME
-MATERIAL_ROOT="$VAULT_PATH/素材库"
+PROJECT_NAME="夜校成人兴趣班"  # 用户指定的项目名
+VAULT_PATH=~/Desktop/黑曜石/内容工厂
+PROJECT="$VAULT_PATH/$PROJECT_NAME"
 
 # 创建 vault（含 .obsidian 最小配置）
 mkdir -p "$VAULT_PATH/.obsidian"
 echo '{}' > "$VAULT_PATH/.obsidian/app.json"
 echo '{}' > "$VAULT_PATH/.obsidian/appearance.json"
 
-# 创建素材库目录结构
-mkdir -p "$MATERIAL_ROOT/1-客户案例"
-mkdir -p "$MATERIAL_ROOT/2-交付故事"
-mkdir -p "$MATERIAL_ROOT/3-行业知识"
-mkdir -p "$MATERIAL_ROOT/4-爆款参考/小红书"
-mkdir -p "$MATERIAL_ROOT/4-爆款参考/抖音"
-mkdir -p "$MATERIAL_ROOT/5-选题报告"
-mkdir -p "$MATERIAL_ROOT/6-内容产出/小红书"
-mkdir -p "$MATERIAL_ROOT/6-内容产出/抖音"
-mkdir -p "$MATERIAL_ROOT/6-内容产出/公众号"
-mkdir -p "$MATERIAL_ROOT/6-内容产出/视频号"
-mkdir -p "$MATERIAL_ROOT/7-选题库"
-mkdir -p "$MATERIAL_ROOT/8-长尾关键词库"
-mkdir -p "$MATERIAL_ROOT/9-客户画像"
-mkdir -p "$MATERIAL_ROOT/10-发布日志/$(date +%Y-%m)"
-mkdir -p "$MATERIAL_ROOT/_模板"
+# 创建项目目录结构
+mkdir -p "$PROJECT/客户案例"
+mkdir -p "$PROJECT/交付故事"
+mkdir -p "$PROJECT/行业知识"
+mkdir -p "$PROJECT/爆款参考/小红书"
+mkdir -p "$PROJECT/爆款参考/抖音"
+mkdir -p "$PROJECT/选题报告"
+mkdir -p "$PROJECT/内容产出/小红书"
+mkdir -p "$PROJECT/内容产出/抖音"
+mkdir -p "$PROJECT/内容产出/公众号"
+mkdir -p "$PROJECT/内容产出/视频号"
+mkdir -p "$PROJECT/选题库"
+mkdir -p "$PROJECT/长尾关键词库"
+mkdir -p "$PROJECT/客户画像"
+mkdir -p "$PROJECT/发布日志/$(date +%Y-%m)"
+mkdir -p "$VAULT_PATH/_模板"
 ```
 
 **Step 3:** 将模板文件写入 `_模板/` 目录。
@@ -257,14 +260,14 @@ mkdir -p "$MATERIAL_ROOT/_模板"
 **Step 4:** 提示用户在 Obsidian 中打开这个 vault：
 ```bash
 # 在 Obsidian 中打开新 vault
-open "obsidian://open?vault=$PROJECT_NAME"
+open "obsidian://open?vault=内容工厂"
 ```
 
 如果 Obsidian 提示 vault 不存在，需要用户在 Obsidian 中手动 Open folder as vault。
 
 **Step 5:** 将新 vault 设为 obsidian-cli 默认：
 ```bash
-obsidian-cli set-default "$PROJECT_NAME"
+obsidian-cli set-default "内容工厂"
 ```
 
 ### 流程 1b: 切换项目
@@ -302,7 +305,7 @@ open "obsidian://open?vault=家政"
 **Step 3:** 通过 obsidian-cli 创建笔记
 ```bash
 VAULT_PATH=$(obsidian-cli print-default --path-only)
-NOTE_PATH="素材库/1-客户案例/家政/张姐-深度保洁-朋友圈推荐.md"
+NOTE_PATH="项目/{项目名}/客户案例/家政/张姐-深度保洁-朋友圈推荐.md"
 
 cat > "$VAULT_PATH/$NOTE_PATH" << 'NOTEEOF'
 {结构化的笔记内容，含 frontmatter}
@@ -334,25 +337,25 @@ obsidian-cli search "张姐" 2>/dev/null
 
 ```bash
 VAULT_PATH=$(obsidian-cli print-default --path-only)
-MATERIAL_ROOT="$VAULT_PATH/素材库"
+PROJECT="$VAULT_PATH/项目/{项目名}"
 
 # 按关键词搜索内容
-grep -r -l "保洁" "$MATERIAL_ROOT/" --include="*.md"
+grep -r -l "保洁" "$PROJECT/" --include="*.md"
 
 # 搜索并显示匹配行（带上下文）
-grep -r -n -C 2 "保洁" "$MATERIAL_ROOT/" --include="*.md"
+grep -r -n -C 2 "保洁" "$PROJECT/" --include="*.md"
 
 # 按标签筛选
-grep -r -l "客户案例" "$MATERIAL_ROOT/" --include="*.md"
+grep -r -l "客户案例" "$PROJECT/" --include="*.md"
 
 # 查找未使用的素材
-grep -r -l "used_count: 0" "$MATERIAL_ROOT/" --include="*.md"
+grep -r -l "used_count: 0" "$PROJECT/" --include="*.md"
 ```
 
 **按目录浏览：**
 ```bash
 VAULT_PATH=$(obsidian-cli print-default --path-only)
-ls "$VAULT_PATH/素材库/1-客户案例/家政/"
+ls "$VAULT_PATH/项目/{项目名}/客户案例/家政/"
 ```
 
 读取搜索结果后，AI 进行相关性排序：
@@ -368,18 +371,19 @@ ls "$VAULT_PATH/素材库/1-客户案例/家政/"
 
 ```bash
 VAULT_PATH=$(obsidian-cli print-default --path-only)
-NOTE_FILE="$VAULT_PATH/素材库/1-客户案例/家政/张姐-深度保洁-朋友圈推荐.md"
+NOTE_FILE="$VAULT_PATH/项目/{项目名}/客户案例/家政/张姐-深度保洁-朋友圈推荐.md"
 
 # AI 直接读取文件内容，修改 frontmatter 中的 used_count +1，然后写回
 ```
 
 同时在内容日志中记录本次发布：
 ```bash
-LOG_DIR="$VAULT_PATH/素材库/10-发布日志/$(date +%Y-%m)"
+LOG_DIR="$VAULT_PATH/项目/{项目名}/发布日志/$(date +%Y-%m)"
 mkdir -p "$LOG_DIR"
 cat > "$LOG_DIR/$(date +%m%d)-${PLATFORM}-${TOPIC}.md" << 'LOGEOF'
 ---
 type: 发布日志
+project: {项目名}
 date: {日期}
 platform: {平台}
 topic: {选题}
@@ -401,22 +405,22 @@ LOGEOF
 
 ```bash
 VAULT_PATH=$(obsidian-cli print-default --path-only)
-MATERIAL_ROOT="$VAULT_PATH/素材库"
+PROJECT="$VAULT_PATH/项目/{项目名}"
 
 echo "=== 素材统计 ==="
-echo "客户案例: $(find "$MATERIAL_ROOT/1-客户案例" -name "*.md" | wc -l | tr -d ' ')"
-echo "交付故事: $(find "$MATERIAL_ROOT/2-交付故事" -name "*.md" | wc -l | tr -d ' ')"
-echo "行业知识: $(find "$MATERIAL_ROOT/3-行业知识" -name "*.md" | wc -l | tr -d ' ')"
-echo "爆款参考: $(find "$MATERIAL_ROOT/4-爆款参考" -name "*.md" | wc -l | tr -d ' ')"
-echo "发布日志: $(find "$MATERIAL_ROOT/10-发布日志" -name "*.md" | wc -l | tr -d ' ')"
+echo "客户案例: $(find "$PROJECT/客户案例" -name "*.md" | wc -l | tr -d ' ')"
+echo "交付故事: $(find "$PROJECT/交付故事" -name "*.md" | wc -l | tr -d ' ')"
+echo "行业知识: $(find "$PROJECT/行业知识" -name "*.md" | wc -l | tr -d ' ')"
+echo "爆款参考: $(find "$PROJECT/爆款参考" -name "*.md" | wc -l | tr -d ' ')"
+echo "发布日志: $(find "$PROJECT/发布日志" -name "*.md" | wc -l | tr -d ' ')"
 
 echo ""
 echo "=== 未使用素材 ==="
-grep -r -l "used_count: 0" "$MATERIAL_ROOT/" --include="*.md" 2>/dev/null | head -10
+grep -r -l "used_count: 0" "$PROJECT/" --include="*.md" 2>/dev/null | head -10
 
 echo ""
 echo "=== 本月新增 ==="
-find "$MATERIAL_ROOT" -name "*.md" -newer "$MATERIAL_ROOT" -mtime -30 | wc -l | tr -d ' '
+find "$PROJECT" -name "*.md" -newer "$PROJECT" -mtime -30 | wc -l | tr -d ' '
 ```
 
 AI 分析统计结果并生成健康报告和建议。

@@ -27,16 +27,22 @@ SEC_J = "text-align: justify; margin-left: 16px; margin-right: 16px"
 SEC_C = "text-align: center; margin-left: 16px; margin-right: 16px"
 
 
+def newlines_to_blank_lines(text_esc: str) -> str:
+    """源码里的换行 → 页面上显示为一空行（双 br）；连续多个换行合并为一次空行。"""
+    collapsed = re.sub(r"\n+", "\n", text_esc)
+    return collapsed.replace("\n", "<br/><br/>")
+
+
 def fmt_inline_bold(s: str) -> str:
-    """将 **重点** 转为带内联样式的 span，其余 HTML 转义。"""
+    """将 **重点** 转为带内联样式的 span，其余 HTML 转义；换行见 newlines_to_blank_lines。"""
     parts = re.split(r"(\*\*.+?\*\*)", s)
     chunks: list[str] = []
     for p in parts:
         if len(p) >= 4 and p.startswith("**") and p.endswith("**"):
             inner = p[2:-2]
-            chunks.append(f'<span style="{BOLD}">{escape(inner)}</span>')
+            chunks.append(f'<span style="{BOLD}">{newlines_to_blank_lines(escape(inner))}</span>')
         else:
-            chunks.append(escape(p))
+            chunks.append(newlines_to_blank_lines(escape(p)))
     return "".join(chunks)
 
 
@@ -205,7 +211,7 @@ def main() -> None:
 <div class="phone">
   <div class="meta">
     <h1>你最好和我一起，哪怕是半程</h1>
-    <p class="sub">已自动<strong>拆段</strong>并标注<strong>重点粗体</strong>（源码见本目录 <code>generate_half_journey.py</code> 中 <code>PARAS</code>，用 <code>**…**</code> 标记）。版式仍为公众号 section + 双层 span。</p>
+    <p class="sub">已自动<strong>拆段</strong>并标注<strong>重点粗体</strong>（<code>PARAS</code> 里用 <code>**…**</code>）。<strong>段内按回车</strong>会在预览里变成<strong>一空行</strong>（连续多下合并为一次）。改完请运行 <code>python3 generate_half_journey.py</code>。</p>
   </div>
   <div id="js_content" class="rich_media_content js_underline_content autoTypeSetting24psection">
 {body}

@@ -75,29 +75,29 @@ lark-cli api POST /open-apis/wiki/v2/spaces --body '{"name": "{项目名}", "des
 ```bash
 SPACE_ID="{上一步的 space_id}"
 
-# 创建根节点「素材库」
+# 创建项目根节点
 lark-cli api POST /open-apis/wiki/v2/spaces/$SPACE_ID/nodes \
-  --body '{"obj_type": "docx", "title": "素材库"}'
-# 记录返回的 node_token 作为 MATERIAL_ROOT_NODE
+  --body '{"obj_type": "docx", "title": "{项目名}"}'
+# 记录返回的 node_token 作为 PROJECT_NODE
 
-# 在素材库下创建各子节点
-for NAME in "1-客户案例" "2-交付故事" "3-行业知识" "5-选题报告" "7-选题库" "8-长尾关键词库" "9-客户画像" "10-发布日志"; do
+# 在项目下创建各子节点
+for NAME in "客户案例" "选题报告" "选题库" "长尾关键词库" "客户画像" "原稿存档" "发布日志"; do
   lark-cli api POST /open-apis/wiki/v2/spaces/$SPACE_ID/nodes \
-    --body "{\"obj_type\": \"docx\", \"title\": \"$NAME\", \"parent_node_token\": \"$MATERIAL_ROOT_NODE\"}"
+    --body "{\"obj_type\": \"docx\", \"title\": \"$NAME\", \"parent_node_token\": \"$PROJECT_NODE\"}"
 done
 
-# 4-爆款参考（含子节点）
+# 爆款参考（含子节点）
 lark-cli api POST /open-apis/wiki/v2/spaces/$SPACE_ID/nodes \
-  --body '{"obj_type": "docx", "title": "4-爆款参考", "parent_node_token": "'$MATERIAL_ROOT_NODE'"}'
+  --body '{"obj_type": "docx", "title": "爆款参考", "parent_node_token": "'$PROJECT_NODE'"}'
 # 记录 node_token 作为 REF_NODE，然后创建子节点
 lark-cli api POST /open-apis/wiki/v2/spaces/$SPACE_ID/nodes \
   --body '{"obj_type": "docx", "title": "小红书", "parent_node_token": "'$REF_NODE'"}'
 lark-cli api POST /open-apis/wiki/v2/spaces/$SPACE_ID/nodes \
   --body '{"obj_type": "docx", "title": "抖音", "parent_node_token": "'$REF_NODE'"}'
 
-# 6-内容产出（含子节点）
+# 内容产出（含子节点）
 lark-cli api POST /open-apis/wiki/v2/spaces/$SPACE_ID/nodes \
-  --body '{"obj_type": "docx", "title": "6-内容产出", "parent_node_token": "'$MATERIAL_ROOT_NODE'"}'
+  --body '{"obj_type": "docx", "title": "内容产出", "parent_node_token": "'$PROJECT_NODE'"}'
 # 记录 node_token 作为 OUTPUT_NODE
 for PLATFORM in "小红书" "抖音" "公众号" "视频号"; do
   lark-cli api POST /open-apis/wiki/v2/spaces/$SPACE_ID/nodes \
@@ -115,10 +115,11 @@ done
     "projects": {
       "{项目名}": {
         "space_id": "xxx",
-        "material_root_node": "xxx",
+        "project_node": "xxx",
         "nodes": {
-          "1-客户案例": "node_token_xxx",
-          "2-交付故事": "node_token_xxx",
+          "客户案例": "node_token_xxx",
+          "爆款参考": "node_token_xxx",
+          "内容产出": "node_token_xxx",
           ...
         }
       }

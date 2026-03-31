@@ -7,7 +7,7 @@ inputs:
   - 目标平台（小红书 / 抖音 / 公众号 / 视频号）
   - 目标用户阶段 A层（A1-A5）
 outputs:
-  - 素材库/6-内容产出/{平台}/{日期}-{平台}-{变体标签}.md
+  - 项目/{项目名}/内容产出/{平台}/{日期}-{平台}-{变体标签}.md
 ---
 
 # 内容生成引擎
@@ -54,7 +54,7 @@ cat "$(git rev-parse --show-toplevel)/content-matrix/skills/knowledge-base/marke
 3. 目标平台：小红书 / 抖音 / 公众号 / 视频号（可多选）
 4. 生成数量：需要几个版本？（矩阵需要多个不同角度的版本）
 5. 目标用户阶段（A层）：A1 / A2 / A3 / A4 / A5
-   - 优先从选题报告中读取（素材库/5-选题报告/ 或 素材库/7-选题库/）
+   - 优先从选题报告中读取（项目/{项目名}/选题报告/ 或 项目/{项目名}/选题库/）
    - 若无选题报告，询问用户；若用户不确定，默认 A2
 ```
 
@@ -71,18 +71,18 @@ cat "$(git rev-parse --show-toplevel)/content-matrix/skills/knowledge-base/marke
 
 ```bash
 VAULT_PATH=$(obsidian-cli print-default --path-only)
-MATERIAL_ROOT="$VAULT_PATH/素材库"
+PROJECT="$VAULT_PATH/项目/{项目名}"
 
 # 按选题关键词搜索相关素材
-grep -r -l "{关键词}" "$MATERIAL_ROOT/" --include="*.md" 2>/dev/null
+grep -r -l "{关键词}" "$PROJECT/" --include="*.md" 2>/dev/null
 
 # 找出未使用或低频使用的素材（优先推荐）
-grep -r -l "used_count: 0" "$MATERIAL_ROOT/" --include="*.md" 2>/dev/null
+grep -r -l "used_count: 0" "$PROJECT/" --include="*.md" 2>/dev/null
 ```
 
 搜索到文件后，读取内容：
 ```bash
-cat "$MATERIAL_ROOT/1-客户案例/教育/{搜索到的文件名}.md"
+cat "$PROJECT/客户案例/{搜索到的文件名}.md"
 ```
 
 AI 对搜索结果进行相关性排序：
@@ -154,6 +154,30 @@ cat templates/douyin.md        # 抖音
 cat templates/wechat-article.md # 公众号
 cat templates/wechat-video.md  # 视频号
 ```
+
+### Step 3.5: 读取迭代规律（如有）
+
+检查当前平台是否已有迭代规律文件，有则读取并在生成时遵守：
+
+```bash
+VAULT_PATH=$(obsidian-cli print-default --path-only)
+PROJECT="$VAULT_PATH/项目/{项目名}"
+RULES_FILE="$PROJECT/原稿存档/_迭代规律/$PLATFORM-迭代规律.md"
+if [ -f "$RULES_FILE" ]; then
+    cat "$RULES_FILE"
+fi
+```
+
+若读取到迭代规律，在 Step 4 的生成 prompt 末尾追加：
+
+```
+## 迭代规律约束（来自用户历史修改的学习）
+{迭代规律文件的内容}
+
+请严格遵守以上规律，这些是用户多次修改后总结出的偏好。
+```
+
+若文件不存在，跳过此步骤。
 
 ### Step 4: 生成内容
 
@@ -294,18 +318,21 @@ PLATFORM="小红书"  # 或抖音/公众号/视频号
 DATE=$(date +%Y-%m-%d)
 VARIANT="性价比震撼型"  # 变体标签
 
-OUTPUT_DIR="$VAULT_PATH/素材库/6-内容产出/$PLATFORM"
+PROJECT="$VAULT_PATH/项目/{项目名}"
+OUTPUT_DIR="$PROJECT/内容产出/$PLATFORM"
 mkdir -p "$OUTPUT_DIR"
 
 cat > "$OUTPUT_DIR/$DATE-$PLATFORM-$VARIANT.md" << 'EOF'
 ---
 type: 内容产出
+project: {项目名}
 platform: {平台}
 date: {日期}
 topic: {选题}
 variant: {变体标签}
 source_material: "[[素材笔记名]]"
 source_report: "[[选题报告笔记名]]"
+draft_path: "[[项目/{项目名}/原稿存档/{日期}-{平台}-{变体标签}]]"
 status: 待发布
 tags:
   - 内容产出
@@ -329,11 +356,53 @@ tags:
 EOF
 ```
 
+同时将相同内容存一份到原稿存档（用于迭代学习对比）：
+
+```bash
+DRAFT_DIR="$PROJECT/原稿存档"
+mkdir -p "$DRAFT_DIR"
+
+# 原稿内容与内容产出/中的文件完全一致，但 frontmatter 不同
+cat > "$DRAFT_DIR/$DATE-$PLATFORM-$VARIANT.md" << 'EOF'
+---
+type: 原稿存档
+project: {项目名}
+platform: {平台}
+date: {日期}
+topic: {选题}
+variant: {变体标签}
+is_draft: true
+iterated: false
+status: 原稿
+tags:
+  - 原稿存档
+  - {平台}
+---
+
+# {标题}
+
+## 正文
+{正文内容}
+
+## 标签
+{标签列表}
+
+## 合规状态
+{合规检查结果}
+
+## 变体信息
+- 视角：{视角}
+- 风格：{风格}
+EOF
+```
+
+并在 `内容产出/` 的文件 frontmatter 中追加 `draft_path` 字段（已包含在上方模板中）。
+
 同时更新素材笔记的 `used_count` 和 `platforms_used`。
 
 选题报告也写入：
 ```bash
-REPORT_DIR="$VAULT_PATH/素材库/5-选题报告"
+REPORT_DIR="$PROJECT/选题报告"
 mkdir -p "$REPORT_DIR"
 # 将 Step 3 的选题分析写入 $REPORT_DIR/$DATE-{关键词}-{平台}选题报告.md
 ```
