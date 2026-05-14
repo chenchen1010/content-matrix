@@ -8,6 +8,9 @@
         "python",
         "main.py"
       ]
+    },
+    "xiaohongshu": {
+      "baseUrl": "http://localhost:18060/mcp"
     }
   },
   "imports": []

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Xiaohongshu Research Delivery Payload",
+  "type": "object",
+  "required": [
+    "doc_title",
+    "business_name",
+    "seed_keywords",
+    "report",
+    "topic_rows",
+    "demo_notes"
+  ],
+  "properties": {
+    "doc_title": {"type": "string"},
+    "business_name": {"type": "string"},
+    "city": {"type": "string"},
+    "industry": {"type": "string"},
+    "business_identity": {"type": "string"},
+    "target_audience": {"type": "string"},
+    "business_summary": {"type": "string"},
+    "seed_keywords": {
+      "type": "array",
+      "minItems": 3,
+      "items": {"type": "string"}
+    },
+    "report": {
+      "type": "object",
+      "properties": {
+        "executive_summary": {"type": "array", "items": {"type": ["string", "object"]}},
+        "industry_overview": {"type": "array", "items": {"type": ["string", "object"]}},
+        "player_landscape": {"type": "array", "items": {"type": ["string", "object"]}},
+        "content_supply": {"type": "array", "items": {"type": ["string", "object"]}},
+        "user_needs": {"type": "array", "items": {"type": ["string", "object"]}},
+        "stage_personas": {"type": "array", "items": {"type": ["string", "object"]}},
+        "effective_playbooks": {"type": "array", "items": {"type": ["string", "object"]}},
+        "opportunity_gaps": {"type": "array", "items": {"type": ["string", "object"]}},
+        "topic_strategy": {"type": "array", "items": {"type": ["string", "object"]}},
+        "action_plan": {"type": "array", "items": {"type": ["string", "object"]}}
+      },
+      "additionalProperties": true
+    },
+    "topic_rows": {
+      "type": "array",
+      "minItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["选题", "阶段", "核心问题", "推荐打法", "优先级"],
+        "properties": {
+          "选题": {"type": "string"},
+          "阶段": {"type": "string", "enum": ["A1", "A2", "A3", "A4", "A5"]},
+          "核心问题": {"type": "string"},
+          "推荐打法": {"type": "string"},
+          "推荐账号类型": {"type": "string"},
+          "内容形式": {"type": "string"},
+          "互动信号": {"type": "string"},
+          "是否已验证": {"type": "string", "enum": ["已验证", "待验证"]},
+          "参考案例": {"type": "string"},
+          "优先级": {"type": "string", "enum": ["高", "中", "低"]},
+          "备注": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "demo_notes": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["title", "stage", "angle", "body"],
+        "properties": {
+          "title": {"type": "string"},
+          "stage": {"type": "string", "enum": ["A1", "A2", "A3", "A4", "A5"]},
+          "angle": {"type": "string"},
+          "body": {"type": "string"},
+          "tags": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,6 +1,6 @@
 ---
 name: topic-scout
-description: 从小红书搜索同类爆款内容，4轮迭代关键词扩展，输出选题情报和对标爆款库
+description: 从小红书搜索同类爆款内容，4轮迭代关键词扩展，识别行业现状、有效打法、用户需求和选题机会
 inputs:
   - 初始关键词 (1-3个)
   - 平台 (默认: 小红书)
@@ -15,6 +15,10 @@ outputs:
 # 选题侦察
 
 从小红书搜索同类爆款内容，通过 4 轮迭代关键词扩展，输出 A1-A5 用户决策阶段标注的完整内容情报：客户画像表、长尾关键词库、对标爆款笔记库、选题库。
+
+> **第一版重点**：不仅要找“什么内容火”，还要识别“什么打法有效”。
+> 重点观察广告笔记、蓝 V 官方号、素人号、KOC/合作号、矩阵号，并结合点赞、评论、活跃度、重复投放/重复结构等信号判断是否值得借鉴。
+> 只要有效，哪怕内容同质化，也应视为可参考打法。
 
 > **输出路径规则**：所有产出写入当前项目的 Obsidian vault（通过 `obsidian-cli print-default --path-only` 获取）。
 > 目录结构见 `content-matrix/schemas/vault-structure.md`。
@@ -180,6 +184,20 @@ Round 1 → Round 4（逐轮执行）：
 #### 素人号/同类竞品扫描（每轮顺带执行）
 
 > **核心洞察**：低互动但持续更新的模板化内容 ≠ 无价值。如果一个素人号反复发同一种模板，说明这套模板在持续带来转化。**只有爆款才值得重复。**
+>
+> **第一版补充要求**：扫描对象不要只限于“同类竞品素人号”，还要显式记录以下玩家类型：
+> 1. **广告笔记**（笔记带广告标识）
+> 2. **蓝 V 官方号 / 品牌号**
+> 3. **素人号**
+> 4. **KOC / 合作号 / 粉丝量较大的半素人号**
+> 5. **矩阵号**（同品牌的多个账号协同发）
+>
+> 对每类玩家，不仅记录“发了什么”，还要记录“这种打法是否有效”：
+> - 点赞是否明显高于同类平均
+> - 评论区是否活跃，是否出现真实咨询/需求互动
+> - 是否持续重复使用同类结构
+> - 是否和其他账号形成协同（如品牌号 + 素人号 + KOC）
+> - 如果有效，即使内容同质化，也标记为“可复用打法”
 
 搜索过程中，除了收集高赞爆款，还要**识别和记录同类竞品账号**：
 
@@ -491,9 +509,77 @@ date: {日期}
 
 ---
 
-### Step 5: 写选题报告
+### Step 5: 写选题报告 + 结构化交付载荷
 
 路径：`$PROJECT/选题报告/{日期}-{关键词}-小红书爆款分析.md`
+
+除 Markdown 报告外，第一版还应同步产出一个**结构化 JSON 载荷**，供飞书交付脚本直接消费。
+
+结构化载荷建议路径：
+- `content-matrix/schemas/xiaohongshu-report-payload.schema.json`（字段规范）
+- `项目/{项目名}/选题报告/{日期}-{关键词}-交付载荷.json`（实际内容）
+
+结构化 JSON 至少包含：
+- 业务信息
+- 3 个种子关键词
+- report 10 个章节：
+  - executive_summary
+  - industry_overview
+  - player_landscape
+  - content_supply
+  - user_needs
+  - stage_personas
+  - effective_playbooks
+  - opportunity_gaps
+  - topic_strategy
+  - action_plan
+- topic_rows：至少 10-15 条
+- demo_notes：后续由 content-generator 补入 3 条
+
+建议在完成本 skill 后，产出如下 JSON 框架：
+
+```json
+{
+  "doc_title": "{城市}{行业}小红书选题调研",
+  "business_name": "{业务名}",
+  "city": "{城市}",
+  "industry": "{行业}",
+  "business_identity": "{业务身份}",
+  "target_audience": "{目标客户}",
+  "business_summary": "{业务概述}",
+  "seed_keywords": ["词1", "词2", "词3"],
+  "report": {
+    "executive_summary": [],
+    "industry_overview": [],
+    "player_landscape": [],
+    "content_supply": [],
+    "user_needs": [],
+    "stage_personas": [],
+    "effective_playbooks": [],
+    "opportunity_gaps": [],
+    "topic_strategy": [],
+    "action_plan": []
+  },
+  "topic_rows": [],
+  "demo_notes": []
+}
+```
+
+如需将 research JSON 和 demo_notes JSON 合并成最终交付 payload，可使用：
+
+```bash
+python3 content-matrix/scripts/compose_xiaohongshu_payload.py \
+  --base content-matrix/scripts/sample_xiaohongshu_report_payload.json \
+  --research /path/to/research.json \
+  --notes /path/to/demo_notes.json \
+  --output /path/to/final_payload.json
+```
+
+然后交给：
+
+```bash
+python3 content-matrix/scripts/deliver_xiaohongshu_report.py /path/to/final_payload.json --notify
+```
 
 ```markdown
 ---
@@ -528,9 +614,11 @@ tags:
 ## 竞品图谱
 
 ### 市场玩家分类
-{按用户业务身份，将搜索中发现的账号分类：}
+{按用户业务身份，将搜索中发现的账号和内容分为：}
 - **同类竞品**（与用户同一类型）：{列表 + 分析}
-- **上游/官方**（如政府、平台）：{列表}
+- **上游/官方**（如政府、平台、蓝 V 品牌号）：{列表}
+- **广告投放内容**（带广告标识的内容）：{列表 + 分析}
+- **素人/KOC/合作号**：{列表 + 分析}
 - **替代品**（不同形态但争夺同一用户）：{列表}
 
 ### 同类竞品素人号详情
@@ -540,6 +628,14 @@ tags:
 
 ### 被验证的内容模板（同类竞品在重复使用的）
 {从竞品素人号提取的模板公式，**这些模板被反复使用 = 已验证有效**}
+
+### 有效打法总结
+按玩家类型输出：
+- 哪类内容是广告驱动
+- 哪类内容更像品牌教育
+- 哪类内容更适合素人/KOC 种草
+- 哪些结构虽然同质化但互动持续有效
+- 哪些打法最值得当前用户优先借鉴
 
 ## 相关文件
 - 长尾关键词库：[[{日期}-{业务}-关键词库]]
